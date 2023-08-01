@@ -5,6 +5,7 @@ import Card from './Card';
 import './App.css';
 import debounce from 'lodash.debounce';
 import classnames from 'classnames';
+import { items } from './assets/db-items';
 
 const onChange = property => function({ target }) {
   const value = target.type === 'checkbox' ? target.checked : target.value;
@@ -16,19 +17,7 @@ const onChange = property => function({ target }) {
 
 const localStorage = window.localStorage;
 
-const defaultTitle = 'Circlet of Blasting'
-
-const defaultDesc = `While wearing this circlet, you can use an action to cast the Scorching Ray spell with it. When you make the spell's attacks, you do so with an **Attack bonus of +5**. The circlet can't be used this way again until the next dawn.`
-
-const defaultState = {
-  cartType: 'default',
-  description: defaultDesc,
-  needsAttunement: false,
-  title: 'Gauntlet of Thunderblasting',
-  type: 'Uncommon',
-  imagePreviewUrl: undefined,
-  value: '100',
-};
+const defaultState = items[0]
 
 const saveData = debounce((key, data) => {
   localStorage.setItem(key, JSON.stringify(data));
@@ -46,6 +35,7 @@ class CardEditor extends Component {
   }
 
   state = {
+    id: '',
     cardType: 'default',
     title: '',
     type: '',
@@ -76,6 +66,12 @@ class CardEditor extends Component {
 
   onReset = () => {
     this.setState(defaultState, this.saveState);
+  }
+
+  onItemChange = (e) => {
+    console.log(e)
+    const item = items.find(item => item.id === e.target.value);
+    this.setState(item)
   }
 
   onSave = () => {
@@ -109,6 +105,7 @@ class CardEditor extends Component {
 
   render() {
     const {
+      id,
       cardType,
       description,
       href,
@@ -120,9 +117,14 @@ class CardEditor extends Component {
     return (
       <div className="container">
         <div className="fields">
+          <select value={id} onChange={this.onItemChange}>
+            {(items || []).map(option => (
+              <option key={option.id} value={option.id}>{option.title}</option>
+            ))}
+          </select>
           <select value={cardType} onChange={this.onChangeCardType}>
             {this.cardTypeOptions.map(option => (
-              <option value={option}>{option}</option>
+              <option key={option} value={option}>{option}</option>
             ))}
           </select>
           <input value={title} onChange={this.onChangeTitle} />
